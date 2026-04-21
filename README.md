@@ -1,5 +1,7 @@
 # LookAway
 
+[![Latest release](https://img.shields.io/github/v/release/gokulkrishh/look-away-mac-app?label=download)](https://github.com/gokulkrishh/look-away-mac-app/releases/latest)
+
 A macOS menu-bar app that nudges you to rest your eyes every 20 minutes of
 active screen use — the 20-20-20 rule, with Liquid Glass.
 
@@ -9,9 +11,24 @@ active screen use — the 20-20-20 rule, with Liquid Glass.
 - Skip or snooze 5 minutes
 - Launch at login
 
+## Download
+
+Grab the latest DMG from the **[Releases page](https://github.com/gokulkrishh/look-away-mac-app/releases/latest)**, drag **LookAway.app** into **Applications**, and launch.
+
+> **Unsigned build:** the current release isn't code-signed, so macOS Gatekeeper will block it on first open. To bypass, run this once in Terminal:
+>
+> ```sh
+> xattr -cr /Applications/LookAway.app
+> ```
+>
+> Or right-click **LookAway.app → Open**, then confirm in the dialog. Signed + notarized builds are planned.
+
 ## Requirements
 
 - macOS 26 Tahoe or later (uses Liquid Glass)
+
+### To build from source
+
 - Xcode 26
 - [xcodegen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`)
 
