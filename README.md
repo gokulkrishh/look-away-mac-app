@@ -13,9 +13,11 @@ active screen use — the 20-20-20 rule, with Liquid Glass.
 
 ## Download
 
-Grab the latest DMG from the **[Releases page](https://github.com/gokulkrishh/look-away-mac-app/releases/latest)**, drag **LookAway.app** into **Applications**, and launch.
+### [**Download LookAway (latest .dmg)**](https://github.com/gokulkrishh/look-away-mac-app/releases/latest)
 
-> **Unsigned build:** the current release isn't code-signed, so macOS Gatekeeper will block it on first open. To bypass, run this once in Terminal:
+Requires **macOS 26 Tahoe or later**. Open the DMG, drag **LookAway.app** into **Applications**, and launch.
+
+> **First launch — unsigned build:** macOS Gatekeeper blocks unsigned apps. Run this once in Terminal to bypass:
 >
 > ```sh
 > xattr -cr /Applications/LookAway.app

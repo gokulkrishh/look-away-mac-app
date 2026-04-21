@@ -29,6 +29,7 @@ targets:
         CFBundleDisplayName: LookAway
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleIconName: AppIcon
         NSHumanReadableCopyright: "© 2026 Gokulakrishnan Kalaikovan"
     entitlements:
       path: LookAway/LookAway.entitlements
@@ -41,3 +42,4 @@ targets:
         ENABLE_PREVIEWS: YES
         SWIFT_EMIT_LOC_STRINGS: YES
         COMBINE_HIDPI_IMAGES: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
