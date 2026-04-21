@@ -1,0 +1,43 @@
+name: LookAway
+options:
+  bundleIdPrefix: com.gokulkrishh
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  defaultConfig: Debug
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: YES
+
+targets:
+  LookAway:
+    type: application
+    platform: macOS
+    sources:
+      - path: LookAway
+    info:
+      path: LookAway/Info.plist
+      properties:
+        LSUIElement: true
+        CFBundleName: LookAway
+        CFBundleDisplayName: LookAway
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSHumanReadableCopyright: "© 2026 Gokulakrishnan Kalaikovan"
+    entitlements:
+      path: LookAway/LookAway.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gokulkrishh.lookaway
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_PREVIEWS: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
+        COMBINE_HIDPI_IMAGES: YES
