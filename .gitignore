@@ -22,3 +22,6 @@ LookAway.xcodeproj/
 
 ## Misc
 *.log
+
+## Release artifacts
+dist/
