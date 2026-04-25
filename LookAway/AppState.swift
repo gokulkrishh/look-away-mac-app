@@ -8,6 +8,7 @@ final class AppState: ObservableObject {
     @AppStorage("breakSecondsDuration") var breakSecondsDuration: Int = 20
     @AppStorage("idlePauseSeconds") var idlePauseSeconds: Int = 120
     @AppStorage("launchAtLogin") var launchAtLogin: Bool = false
+    @AppStorage("breakEndSoundEnabled") var breakEndSoundEnabled: Bool = true
 
     let scheduler = BreakScheduler()
     let overlay = OverlayController()
@@ -42,6 +43,7 @@ final class AppState: ObservableObject {
         scheduler.workInterval = TimeInterval(max(1, workIntervalMinutes) * 60)
         scheduler.breakDuration = TimeInterval(max(5, breakSecondsDuration))
         scheduler.idlePauseThreshold = TimeInterval(max(30, idlePauseSeconds))
+        scheduler.breakEndSoundEnabled = breakEndSoundEnabled
     }
 
     var nextBreakText: String {

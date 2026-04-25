@@ -23,6 +23,13 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section("Sound") {
+                Toggle("Break end sound", isOn: $state.breakEndSoundEnabled)
+                Text("Plays a chime when your break is over so you know it's time to get back.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Startup") {
                 Toggle("Launch at login", isOn: Binding(
                     get: { state.launchAtLogin },
@@ -34,9 +41,10 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 420, height: 380)
+        .frame(width: 420, height: 460)
         .onChange(of: state.workIntervalMinutes) { _, _ in state.syncSchedulerSettings() }
         .onChange(of: state.breakSecondsDuration) { _, _ in state.syncSchedulerSettings() }
         .onChange(of: state.idlePauseSeconds) { _, _ in state.syncSchedulerSettings() }
+        .onChange(of: state.breakEndSoundEnabled) { _, _ in state.syncSchedulerSettings() }
     }
 }
