@@ -27,7 +27,7 @@ final class AppState: ObservableObject {
 
         scheduler.onBreakStart = { [weak self] in
             guard let self else { return }
-            if self.pauseMediaDuringBreak { self.media.pauseIfPlaying() }
+            if self.pauseMediaDuringBreak { self.media.pauseMedia() }
             self.overlay.show(durationSeconds: self.scheduler.breakDuration) { action in
                 switch action {
                 case .skip: self.scheduler.skipBreak()
@@ -37,7 +37,6 @@ final class AppState: ObservableObject {
         }
         scheduler.onBreakEnd = { [weak self] in
             self?.overlay.hide()
-            self?.media.resumeIfPaused()
         }
 
         scheduler.start()

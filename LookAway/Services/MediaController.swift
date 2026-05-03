@@ -1,48 +1,50 @@
-import Foundation
+import AppKit
+import ApplicationServices
 
-/// Pauses and resumes "now playing" media (Spotify, Apple Music, Safari/Chrome video, etc.)
-/// using Apple's private MediaRemote framework. Uses dedicated pause/play commands rather
-/// than a play/pause toggle, so we never accidentally start playback that wasn't running.
+/// Pauses "now playing" media (Spotify, Apple Music, video in Safari/Chrome/Firefox, etc.)
+/// by posting the system Play/Pause key event — the same event Apple keyboards send on F8.
+/// Requires Accessibility permission; until granted, the post is a silent no-op.
 @MainActor
 final class MediaController {
-    private typealias GetIsPlayingFunc = @convention(c) (DispatchQueue, @escaping @Sendable (Bool) -> Void) -> Void
-    private typealias SendCommandFunc = @convention(c) (Int32, CFDictionary?) -> Bool
+    // NX_KEYTYPE_PLAY from <IOKit/hidsystem/ev_keymap.h>
+    private static let mediaKeyPlayPause: UInt32 = 16
 
-    // MRCommand values from MediaRemote.framework
-    private static let kMRPlay: Int32 = 0
-    private static let kMRPause: Int32 = 1
+    /// Sends one Play/Pause key press. The hardware key is a toggle, so this pauses what's
+    /// playing — but if nothing is playing, the system may launch the default media app
+    /// (typically Music). That's a known macOS behavior we can't suppress without private APIs.
+    func pauseMedia() {
+        postMediaKey(down: true)
+        postMediaKey(down: false)
+    }
 
-    private var getIsPlaying: GetIsPlayingFunc?
-    private var sendCommand: SendCommandFunc?
-    private var didPause = false
+    var isAccessibilityTrusted: Bool { AXIsProcessTrusted() }
 
-    init() {
-        let path = "/System/Library/PrivateFrameworks/MediaRemote.framework/MediaRemote"
-        guard let handle = dlopen(path, RTLD_LAZY) else { return }
-        if let sym = dlsym(handle, "MRMediaRemoteGetNowPlayingApplicationIsPlaying") {
-            getIsPlaying = unsafeBitCast(sym, to: GetIsPlayingFunc.self)
-        }
-        if let sym = dlsym(handle, "MRMediaRemoteSendCommand") {
-            sendCommand = unsafeBitCast(sym, to: SendCommandFunc.self)
+    /// Triggers the system Accessibility prompt the first time it's called for this app.
+    @discardableResult
+    func requestAccessibilityIfNeeded() -> Bool {
+        AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
+    }
+
+    func openAccessibilitySettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+            NSWorkspace.shared.open(url)
         }
     }
 
-    func pauseIfPlaying() {
-        guard let getIsPlaying else { return }
-        getIsPlaying(.main) { [weak self] isPlaying in
-            guard isPlaying else { return }
-            Task { @MainActor in
-                guard let self, let send = self.sendCommand else { return }
-                if send(Self.kMRPause, nil) {
-                    self.didPause = true
-                }
-            }
-        }
-    }
-
-    func resumeIfPaused() {
-        guard didPause, let sendCommand else { return }
-        didPause = false
-        _ = sendCommand(Self.kMRPlay, nil)
+    private func postMediaKey(down: Bool) {
+        let phase: Int = down ? 0xA : 0xB
+        let data1 = Int((Self.mediaKeyPlayPause << 16) | UInt32(phase << 8))
+        guard let event = NSEvent.otherEvent(
+            with: .systemDefined,
+            location: .zero,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            subtype: 8,
+            data1: data1,
+            data2: -1
+        ) else { return }
+        event.cgEvent?.post(tap: .cghidEventTap)
     }
 }

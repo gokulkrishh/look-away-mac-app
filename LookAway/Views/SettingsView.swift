@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var state: AppState
+    @State private var mediaPermissionTrusted: Bool = false
 
     var body: some View {
         Form {
@@ -32,9 +33,20 @@ struct SettingsView: View {
 
             Section("Media") {
                 Toggle("Pause media during breaks", isOn: $state.pauseMediaDuringBreak)
-                Text("Pauses Spotify, Apple Music, video, etc. when a break starts and resumes when it ends.")
+                Text("Sends the macOS Play/Pause key when a break starts. Works with Spotify, Apple Music, and video in Safari, Chrome, and Firefox. You'll need to resume manually after the break.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                if state.pauseMediaDuringBreak && !mediaPermissionTrusted {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
+                        Text("LookAway needs Accessibility permission to send the media key.")
+                            .font(.caption)
+                        Spacer()
+                        Button("Open Settings") { state.media.openAccessibilitySettings() }
+                            .controlSize(.small)
+                    }
+                }
             }
 
             Section("Startup") {
@@ -53,5 +65,13 @@ struct SettingsView: View {
         .onChange(of: state.breakSecondsDuration) { _, _ in state.syncSchedulerSettings() }
         .onChange(of: state.idlePauseSeconds) { _, _ in state.syncSchedulerSettings() }
         .onChange(of: state.breakEndSoundEnabled) { _, _ in state.syncSchedulerSettings() }
+        .onChange(of: state.pauseMediaDuringBreak) { _, isOn in
+            if isOn { state.media.requestAccessibilityIfNeeded() }
+            mediaPermissionTrusted = state.media.isAccessibilityTrusted
+        }
+        .onAppear { mediaPermissionTrusted = state.media.isAccessibilityTrusted }
+        .onReceive(Timer.publish(every: 2, on: .main, in: .common).autoconnect()) { _ in
+            mediaPermissionTrusted = state.media.isAccessibilityTrusted
+        }
     }
 }
