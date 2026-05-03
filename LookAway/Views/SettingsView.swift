@@ -30,6 +30,13 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section("Media") {
+                Toggle("Pause media during breaks", isOn: $state.pauseMediaDuringBreak)
+                Text("Pauses Spotify, Apple Music, video, etc. when a break starts and resumes when it ends.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Startup") {
                 Toggle("Launch at login", isOn: Binding(
                     get: { state.launchAtLogin },

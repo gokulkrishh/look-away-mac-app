@@ -9,9 +9,11 @@ final class AppState: ObservableObject {
     @AppStorage("idlePauseSeconds") var idlePauseSeconds: Int = 120
     @AppStorage("launchAtLogin") var launchAtLogin: Bool = false
     @AppStorage("breakEndSoundEnabled") var breakEndSoundEnabled: Bool = true
+    @AppStorage("pauseMediaDuringBreak") var pauseMediaDuringBreak: Bool = true
 
     let scheduler = BreakScheduler()
     let overlay = OverlayController()
+    let media = MediaController()
 
     private var bag = Set<AnyCancellable>()
 
@@ -25,6 +27,7 @@ final class AppState: ObservableObject {
 
         scheduler.onBreakStart = { [weak self] in
             guard let self else { return }
+            if self.pauseMediaDuringBreak { self.media.pauseIfPlaying() }
             self.overlay.show(durationSeconds: self.scheduler.breakDuration) { action in
                 switch action {
                 case .skip: self.scheduler.skipBreak()
@@ -34,6 +37,7 @@ final class AppState: ObservableObject {
         }
         scheduler.onBreakEnd = { [weak self] in
             self?.overlay.hide()
+            self?.media.resumeIfPaused()
         }
 
         scheduler.start()
